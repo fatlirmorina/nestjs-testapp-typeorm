@@ -16,6 +16,7 @@ export class UsersService {
   ) {}
 
   async login(loginUserDto: LoginUserDTO) {
+    console.log(process.env.DB_HOST);
     const user = await this.userRepository.findOne({email: loginUserDto.email});
     if(user) {
       const isMatch = await bcrypt.compare(loginUserDto.password, user.password);
@@ -44,21 +45,21 @@ export class UsersService {
     return this.userRepository.find({select: ["name", "email"]});
   }
 
-  async findOne(id: number): Promise<UpdateUserDto> {
-    const user = await this.userRepository.findOne(id, {select: ["name", "email"]});
+  async findOne(id: number) {
+    const user = await this.userRepository.findOne(+id, {select: ["name", "email"]});
     if(!user) throw new HttpException('Could not find the given id', 404);
     return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.userRepository.findOne(id);
+    const user = await this.userRepository.findOne(+id);
     if(!user) throw new HttpException('Could not find the given id', 404);
     return this.userRepository.update(id, updateUserDto);
   }
 
   async remove(id: number) {
-    const user = await this.userRepository.findOne(id);
+    const user = await this.userRepository.findOne(+id);
     if(!user) throw new HttpException('Could not find the given id', 404);
-    return this.userRepository.delete(id);
+    return this.userRepository.delete(+id);
   }
 }
