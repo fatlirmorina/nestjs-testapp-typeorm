@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { LoginUserDTO } from './dto/login-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +14,19 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>
   ) {}
+
+  async login(loginUserDto: LoginUserDTO) {
+    const user = await this.userRepository.findOne({email: loginUserDto.email});
+    if(user) {
+      const isMatch = await bcrypt.compare(loginUserDto.password, user.password);
+      if(isMatch)
+      {
+        const token = 'JWT token here';
+        return {success: true, token: token, timestamp: new Date()};
+      }   
+    } 
+    throw new HttpException('Email or password do not match in our records.', 404);
+  }  
 
   async create(createUserDto: CreateUserDto) {
     let password = await bcrypt.hash(createUserDto.password, 10);
@@ -27,11 +41,11 @@ export class UsersService {
   }
 
   findAll() {
-    return this.userRepository.find();
+    return this.userRepository.find({select: ["name", "email"]});
   }
 
   async findOne(id: number): Promise<UpdateUserDto> {
-    const user = await this.userRepository.findOne(id);
+    const user = await this.userRepository.findOne(id, {select: ["name", "email"]});
     if(!user) throw new HttpException('Could not find the given id', 404);
     return user;
   }

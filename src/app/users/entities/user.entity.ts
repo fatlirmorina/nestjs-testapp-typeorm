@@ -11,9 +11,9 @@ export class User {
     @Column()
     email: string;
 
-    @Column({select: false, length: 1000})
+    @Column({length: 1000})
     password: string;
 
-    @Column({select: false})
+    @Column()
     ip: string;
 }
