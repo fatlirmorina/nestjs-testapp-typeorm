@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDTO } from './dto/login-user.dto';
 
+// gent preva
+
 @Injectable()
 export class UsersService {
 
